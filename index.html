@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosistema Visual - Diego Vainesman</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #7f8c8d;
+            font-weight: 400;
+        }
+
+        .decagon-wrapper {
+            position: relative;
+            width: 700px;
+            height: 700px;
+            margin: 0 auto;
+            margin-bottom: 40px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .decagon-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .circle-node {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            font-size: 0.7em;
+            font-weight: 500;
+            line-height: 1.1;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .circle-node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+        }
+
+        .node-number {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .node-label {
+            font-size: 0.75em;
+            line-height: 1.0;
+            text-align: center;
+        }
+
+        /* Colores específicos para cada elemento del ecosistema visual */
+        .position-1 { background: #E91E63; color: white; } /* Autenticidad Narrativa - Rosa Magenta */
+        .position-2 { background: #D1006F; color: white; } /* Unidad Sistemática - Rosa Fucsia */
+        .position-3 { background: #8E24AA; color: white; } /* Adaptabilidad Contextual - Púrpura */
+        .position-4 { background: #3F51B5; color: white; } /* Orden Estratégico - Azul Índigo */
+        .position-5 { background: #2196F3; color: white; } /* Resonancia Emocional - Azul Eléctrico */
+        .position-6 { background: #00BCD4; color: black; } /* Claridad Intencional - Cian Claro */
+        .position-7 { background: #4CAF50; color: white; } /* Diferenciación Memorable - Verde Brillante */
+        .position-8 { background: #8BC34A; color: black; } /* Evolución Controlada - Verde Lima */
+        .position-9 { background: #CDDC39; color: black; } /* Comunicación Clara - Lima Amarillo */
+        .position-10 { background: #FFEB3B; color: black; } /* Integración Tecnológica - Amarillo Verde */
+
+        /* POSICIONES MATEMÁTICAMENTE EXACTAS - Calculadas con trigonometría */
+        /* Centro (350, 350), Radio 220px, cada elemento a 130px del borde */
+        
+        .position-1 { 
+            top: 130px; 
+            left: 350px; 
+            transform: translate(-50%, -50%); 
+        } /* Autenticidad Narrativa - 0° - Rosa Magenta */
+        
+        .position-2 { 
+            top: 172px; 
+            left: 479px; 
+            transform: translate(-50%, -50%); 
+        } /* Unidad Sistemática - 36° - Rosa Fucsia */
+        
+        .position-3 { 
+            top: 282px; 
+            left: 559px; 
+            transform: translate(-50%, -50%); 
+        } /* Adaptabilidad Contextual - 72° - Púrpura */
+        
+        .position-4 { 
+            top: 418px; 
+            left: 559px; 
+            transform: translate(-50%, -50%); 
+        } /* Orden Estratégico - 108° - Azul Índigo */
+        
+        .position-5 { 
+            top: 528px; 
+            left: 479px; 
+            transform: translate(-50%, -50%); 
+        } /* Resonancia Emocional - 144° - Azul Eléctrico */
+        
+        .position-6 { 
+            top: 570px; 
+            left: 350px; 
+            transform: translate(-50%, -50%); 
+        } /* Claridad Intencional - 180° - Cian Claro */
+        
+        .position-7 { 
+            top: 528px; 
+            left: 221px; 
+            transform: translate(-50%, -50%); 
+        } /* Diferenciación Memorable - 216° - Verde Brillante */
+        
+        .position-8 { 
+            top: 418px; 
+            left: 141px; 
+            transform: translate(-50%, -50%); 
+        } /* Evolución Controlada - 252° - Verde Lima */
+        
+        .position-9 { 
+            top: 282px; 
+            left: 141px; 
+            transform: translate(-50%, -50%); 
+        } /* Comunicación Clara - 288° - Lima Amarillo */
+        
+        .position-10 { 
+            top: 172px; 
+            left: 221px; 
+            transform: translate(-50%, -50%); 
+        } /* Integración Tecnológica - 324° - Amarillo Verde */
+
+        .slider-controls {
+            margin-top: 10px;
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .range-slider {
+            width: 80%;
+            margin: 3px 0;
+        }
+
+        .score-display {
+            font-weight: bold;
+            margin-top: 3px;
+            font-size: 0.7em;
+        }
+
+        .control-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .brand-input {
+            margin: 10px;
+            padding: 10px 15px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 1em;
+            width: 200px;
+        }
+
+        .control-btn {
+            margin: 5px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .control-btn:hover {
+            background: #2980b9;
+        }
+
+        .footer-banner {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .results-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .results-content {
+            text-align: left;
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            white-space: pre-line;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .footer-banner h4 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .footer-banner h4::before {
+            content: '💎';
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #2c3e50;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .center-line1 {
+            font-size: 1.8em;
+            line-height: 1.0;
+            margin-bottom: 5px;
+        }
+
+        .center-line2 {
+            font-size: 1.8em;
+            line-height: 1.0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Los 10 Elementos del Ecosistema Visual</h1>
+            <p>Herramienta de Evaluación y Análisis de Marcas</p>
+            <p style="font-size: 0.9em; color: #95a5a6; margin-top: 10px;">Desarrollada por Diego Vainesman</p>
+        </div>
+
+        <div class="control-panel">
+            <input type="text" class="brand-input" id="brandName" placeholder="Nombre de la marca" />
+            <button class="control-btn" onclick="toggleEvaluation()">Activar Evaluación</button>
+            <button class="control-btn" onclick="resetScores()">Reset</button>
+            <button class="control-btn" onclick="showExample()">Ejemplo: Apple</button>
+            <button class="control-btn" onclick="generateResults()" style="background: #28a745;">Generar Resumen</button>
+        </div>
+
+        <div class="decagon-wrapper">
+            <!-- SVG DECÁGONO -->
+            <svg class="decagon-svg" viewBox="0 0 700 700">
+                <polygon points="350,50 543,108 636,268 636,432 543,592 350,650 157,592 64,432 64,268 157,108" 
+                         fill="rgba(255,255,255,0.1)" 
+                         stroke="#ccc" 
+                         stroke-width="12"/>
+            </svg>
+            
+            <!-- TEXTO CENTRAL -->
+            <div class="center-text">
+                <div class="center-line1">Ecosistema</div>
+                <div class="center-line2">Visual</div>
+            </div>
+            
+            <!-- ELEMENTO 1: AUTENTICIDAD NARRATIVA -->
+            <div class="circle-node position-1" data-element="autenticidad-narrativa">
+                <div class="node-number">1</div>
+                <div class="node-label">Autenticidad<br>Narrativa</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="autenticidad-narrativa">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 2: UNIDAD SISTEMÁTICA -->
+            <div class="circle-node position-2" data-element="unidad-sistematica">
+                <div class="node-number">2</div>
+                <div class="node-label">Unidad<br>Sistemática</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="unidad-sistematica">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 3: ADAPTABILIDAD CONTEXTUAL -->
+            <div class="circle-node position-3" data-element="adaptabilidad-contextual">
+                <div class="node-number">3</div>
+                <div class="node-label">Adaptabilidad<br>Contextual</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="adaptabilidad-contextual">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 4: ORDEN ESTRATÉGICO -->
+            <div class="circle-node position-4" data-element="orden-estrategico">
+                <div class="node-number">4</div>
+                <div class="node-label">Orden<br>Estratégico</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="orden-estrategico">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 5: RESONANCIA EMOCIONAL -->
+            <div class="circle-node position-5" data-element="resonancia-emocional">
+                <div class="node-number">5</div>
+                <div class="node-label">Resonancia<br>Emocional</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="resonancia-emocional">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 6: CLARIDAD INTENCIONAL -->
+            <div class="circle-node position-6" data-element="claridad-intencional">
+                <div class="node-number">6</div>
+                <div class="node-label">Claridad<br>Intencional</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="claridad-intencional">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 7: DIFERENCIACIÓN MEMORABLE -->
+            <div class="circle-node position-7" data-element="diferenciacion-memorable">
+                <div class="node-number">7</div>
+                <div class="node-label">Diferenciación<br>Memorable</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="diferenciacion-memorable">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 8: EVOLUCIÓN CONTROLADA -->
+            <div class="circle-node position-8" data-element="evolucion-controlada">
+                <div class="node-number">8</div>
+                <div class="node-label">Evolución<br>Controlada</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="evolucion-controlada">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 9: COMUNICACIÓN CLARA -->
+            <div class="circle-node position-9" data-element="comunicacion-clara">
+                <div class="node-number">9</div>
+                <div class="node-label">Comunicación<br>Clara</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="comunicacion-clara">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+
+            <!-- ELEMENTO 10: INTEGRACIÓN TECNOLÓGICA -->
+            <div class="circle-node position-10" data-element="integracion-tecnologica">
+                <div class="node-number">10</div>
+                <div class="node-label">Integración<br>Tecnológica</div>
+                <div class="slider-controls">
+                    <input type="range" class="range-slider" min="1" max="10" value="5" data-element="integracion-tecnologica">
+                    <div class="score-display">5/10</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-panel" id="resultsPanel">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">📊 Resumen de Evaluación</h3>
+            <div class="results-content" id="resultsContent"></div>
+            <button class="copy-btn" onclick="copyResults()">📋 Copiar Resultados</button>
+            <p style="font-size: 0.9em; color: #6c757d; margin-top: 10px;">
+                💡 Copia este resumen y envíaselo a tu profesor
+            </p>
+        </div>
+
+        <div class="footer-banner">
+            <h4>VENTAJA ÚNICA:</h4>
+            <p>Esta herramienta combina rigor analítico con impacto visual inmediato. 
+            Los participantes "ven" el ecosistema visual de manera tangible, no solo conceptual.</p>
+            <p style="font-size: 0.9em; margin-top: 15px; opacity: 0.8;">© 2025 Diego Vainesman</p>
+        </div>
+    </div>
+
+    <script>
+        let evaluationMode = false;
+        let currentScores = {};
+
+        function toggleEvaluation() {
+            evaluationMode = !evaluationMode;
+            const sliders = document.querySelectorAll('.slider-controls');
+            const btn = event.target;
+            
+            if (evaluationMode) {
+                sliders.forEach(slider => slider.style.display = 'flex');
+                btn.textContent = 'Ocultar Evaluación';
+                btn.style.background = '#e74c3c';
+                setupSliders();
+            } else {
+                sliders.forEach(slider => slider.style.display = 'none');
+                btn.textContent = 'Activar Evaluación';
+                btn.style.background = '#3498db';
+            }
+        }
+
+        function setupSliders() {
+            const sliders = document.querySelectorAll('.range-slider');
+            sliders.forEach(slider => {
+                const element = slider.dataset.element;
+                currentScores[element] = parseInt(slider.value);
+                
+                slider.addEventListener('input', function() {
+                    currentScores[element] = parseInt(this.value);
+                    const scoreDisplay = this.nextElementSibling;
+                    scoreDisplay.textContent = `${this.value}/10`;
+                });
+            });
+        }
+
+        function resetScores() {
+            const sliders = document.querySelectorAll('.range-slider');
+            sliders.forEach(slider => {
+                slider.value = 5;
+                const element = slider.dataset.element;
+                currentScores[element] = 5;
+                const scoreDisplay = slider.nextElementSibling;
+                scoreDisplay.textContent = '5/10';
+            });
+        }
+
+        function showExample() {
+            const appleScores = {
+                'autenticidad-narrativa': 9,
+                'unidad-sistematica': 10,
+                'adaptabilidad-contextual': 9,
+                'orden-estrategico': 10,
+                'resonancia-emocional': 9,
+                'claridad-intencional': 10,
+                'diferenciacion-memorable': 8,
+                'evolucion-controlada': 8,
+                'comunicacion-clara': 9,
+                'integracion-tecnologica': 10
+            };
+
+            const sliders = document.querySelectorAll('.range-slider');
+            sliders.forEach(slider => {
+                const element = slider.dataset.element;
+                if (appleScores[element]) {
+                    slider.value = appleScores[element];
+                    currentScores[element] = appleScores[element];
+                    const scoreDisplay = slider.nextElementSibling;
+                    scoreDisplay.textContent = `${appleScores[element]}/10`;
+                }
+            });
+        }
+
+        function generateResults() {
+            const brandName = document.getElementById('brandName').value || 'Marca sin nombre';
+            const resultsPanel = document.getElementById('resultsPanel');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            // Calcular puntuación total
+            let totalScore = 0;
+            let evaluationText = `EVALUACIÓN ECOSISTEMA VISUAL
+=====================================
+Marca: ${brandName}
+Fecha: ${new Date().toLocaleDateString('es-ES')}
+Evaluador: [Tu nombre aquí]
+
+PUNTUACIONES POR ELEMENTO:
+--------------------------`;
+            
+            const elementNames = {
+                'autenticidad-narrativa': 'Autenticidad Narrativa',
+                'unidad-sistematica': 'Unidad Sistemática',
+                'adaptabilidad-contextual': 'Adaptabilidad Contextual',
+                'orden-estrategico': 'Orden Estratégico',
+                'resonancia-emocional': 'Resonancia Emocional',
+                'claridad-intencional': 'Claridad Intencional',
+                'diferenciacion-memorable': 'Diferenciación Memorable',
+                'evolucion-controlada': 'Evolución Controlada',
+                'comunicacion-clara': 'Comunicación Clara',
+                'integracion-tecnologica': 'Integración Tecnológica'
+            };
+            
+            Object.keys(elementNames).forEach((key, index) => {
+                const score = currentScores[key] || 5;
+                totalScore += score;
+                evaluationText += `\n${index + 1}. ${elementNames[key]}: ${score}/10`;
+            });
+            
+            const averageScore = (totalScore / 10).toFixed(1);
+            
+            evaluationText += `\n\nRESUMEN:
+--------
+Puntuación Total: ${totalScore}/100
+Promedio: ${averageScore}/10
+Nivel: ${getPerformanceLevel(averageScore)}
+
+METODOLOGÍA: Ecosistema Visual de Diego Vainesman
+=====================================`;
+            
+            resultsContent.textContent = evaluationText;
+            resultsPanel.style.display = 'block';
+            resultsPanel.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function getPerformanceLevel(average) {
+            if (average >= 9) return 'EXCELENTE';
+            if (average >= 8) return 'MUY BUENO';
+            if (average >= 7) return 'BUENO';
+            if (average >= 6) return 'REGULAR';
+            return 'NECESITA MEJORA';
+        }
+        
+        function copyResults() {
+            const resultsContent = document.getElementById('resultsContent');
+            navigator.clipboard.writeText(resultsContent.textContent).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ ¡Copiado!';
+                btn.style.background = '#28a745';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#28a745';
+                }, 2000);
+            });
+        }
+
+        document.getElementById('brandName').value = 'Apple';
+    </script>
+</body>
+</html>
